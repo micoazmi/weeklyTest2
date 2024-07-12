@@ -9,8 +9,9 @@ const (
 )
 
 type Employee struct {
-	empId    int
-	fullName string
-	salary   float64
-	status   Status
+	EmpId       int
+	FullName    string
+	Salary      float64
+	Status      Status
+	TotalSalary float64
 }

@@ -2,5 +2,5 @@ package models
 
 type PermanentModel struct {
 	Employee
-	insurance float64
+	Insurance float64
 }
