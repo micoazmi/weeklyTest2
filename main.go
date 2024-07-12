@@ -17,6 +17,10 @@ func randomStatus() models.Status {
 	return statuses[rand.Intn(len(statuses))]
 }
 
+func TotalSalary(salary float64, additional float64) float64 {
+	return salary + additional
+}
+
 func createEmployee(id int, ch chan<- interface{}) {
 	salary := 5000 + rand.Float64()*(15000-5000)
 	status := randomStatus()
@@ -24,34 +28,43 @@ func createEmployee(id int, ch chan<- interface{}) {
 
 	switch status {
 	case models.Permanent:
+		insurance := 500_000.00
+		totalSalary := TotalSalary(salary, insurance)
 		ch <- models.PermanentModel{
 			Employee: models.Employee{
-				EmpId:    id,
-				FullName: name,
-				Salary:   salary,
-				Status:   status,
+				EmpId:       id,
+				FullName:    name,
+				Salary:      salary,
+				Status:      status,
+				TotalSalary: totalSalary,
 			},
-			Insurance: 500_000,
+			Insurance: insurance,
 		}
 	case models.Contract:
+		overtime := 55_000.00
+		totalSalary := TotalSalary(salary, overtime)
 		ch <- models.ContractModel{
 			Employee: models.Employee{
-				EmpId:    id,
-				FullName: name,
-				Salary:   salary,
-				Status:   status,
+				EmpId:       id,
+				FullName:    name,
+				Salary:      salary,
+				Status:      status,
+				TotalSalary: totalSalary,
 			},
-			Overtime: 55_000,
+			Overtime: overtime,
 		}
 	case models.Trainee:
+		allowance := 500_000.00
+		totalSalary := TotalSalary(salary, allowance)
 		ch <- models.TraineeModel{
 			Employee: models.Employee{
-				EmpId:    id,
-				FullName: name,
-				Salary:   salary,
-				Status:   status,
+				EmpId:       id,
+				FullName:    name,
+				Salary:      salary,
+				Status:      status,
+				TotalSalary: totalSalary,
 			},
-			Allowance: 100_000,
+			Allowance: allowance,
 		}
 	}
 
@@ -73,34 +86,11 @@ func main() {
 	wg.Wait()
 	close(ch)
 
-	var permanentEmployees []models.PermanentModel
-	var contractEmployees []models.ContractModel
-	var traineeEmployees []models.TraineeModel
+	for numEmployees > 0 {
+		d := <-ch
+		numEmployees--
+		fmt.Println(d)
 
-	for e := range ch {
-		switch emp := e.(type) {
-		case models.PermanentModel:
-			permanentEmployees = append(permanentEmployees, emp)
-		case models.ContractModel:
-			contractEmployees = append(contractEmployees, emp)
-		case models.TraineeModel:
-			traineeEmployees = append(traineeEmployees, emp)
-		}
-
-	}
-
-	fmt.Println("Permanen employees")
-	for _, v := range permanentEmployees {
-		fmt.Println(v)
-	}
-
-	fmt.Println("Contracrt employees")
-	for _, v := range contractEmployees {
-		fmt.Println(v)
-	}
-	fmt.Println("Trainee employees")
-	for _, v := range traineeEmployees {
-		fmt.Println(v)
 	}
 
 }
