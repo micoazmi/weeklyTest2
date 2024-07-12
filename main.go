@@ -97,7 +97,6 @@ func main() {
 			salaryCh <- emp.TotalSalary
 		case models.ContractModel:
 			salaryCh <- emp.TotalSalary
-
 		case models.TraineeModel:
 			salaryCh <- emp.TotalSalary
 
