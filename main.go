@@ -73,6 +73,7 @@ func createEmployee(id int, ch chan<- interface{}) {
 func main() {
 	numEmployees := 100
 	ch := make(chan interface{}, numEmployees)
+	salaryCh := make(chan float64, numEmployees)
 	var wg sync.WaitGroup
 
 	for i := 1; i <= numEmployees; i++ {
@@ -86,11 +87,29 @@ func main() {
 	wg.Wait()
 	close(ch)
 
+	var totalSalary float64
 	for numEmployees > 0 {
 		d := <-ch
 		numEmployees--
 		fmt.Println(d)
+		switch emp := d.(type) {
+		case models.PermanentModel:
+			salaryCh <- emp.TotalSalary
+		case models.ContractModel:
+			salaryCh <- emp.TotalSalary
+
+		case models.TraineeModel:
+			salaryCh <- emp.TotalSalary
+
+		}
 
 	}
+	close(salaryCh)
+
+	for v := range salaryCh {
+		totalSalary += v
+	}
+
+	fmt.Printf("Total salary all employee %.2f", totalSalary)
 
 }
